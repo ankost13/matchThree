@@ -7,6 +7,8 @@ import {SoundsManager} from "../utils/soundsManager";
 import {AssetLoader} from "../utils/loader";
 import {BgView} from "../modules/bg/bgView";
 import {BgMediator} from "../modules/bg/bgMediator";
+import {FirstMediator} from "../modules/firstScreen/firstMediator";
+import {FirstView} from "../modules/firstScreen/firstView";
 
 export class App extends Application {
 
@@ -25,6 +27,7 @@ export class App extends Application {
         this.gameMediator = new GameMediator();
         this.gameMediator.resourcesLoaded();
 
+        this.registerFirstScreen();
         this.registerBg();
     }
 
@@ -40,6 +43,13 @@ export class App extends Application {
         const parent = new Container();
         this.stage.addChild(parent);
         mediator.initView(PreloaderView, parent);
+    }
+
+    registerFirstScreen() {
+        const mediator = new FirstMediator();
+        const parent = new Container();
+        this.stage.addChild(parent);
+        mediator.initView(FirstView, parent);
     }
 
     registerBg() {

@@ -4,12 +4,13 @@ export const manifest = {
             name: "gameAssets",
             assetsImg: {
                 test: {src: "./assets/img/icon.png"},
+                bg: {src: "./assets/img/bg.png"},
             },
 
             spineAssets: {
                 spineboy: {
                     type: "spine",
-                    json: "./assets/spine/test_task.json"
+                    json: "./assets/spine/windmill/windmill-ess.json"
                 },
             }
         }
