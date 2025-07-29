@@ -9,6 +9,8 @@ import {BgView} from "../modules/bg/bgView";
 import {BgMediator} from "../modules/bg/bgMediator";
 import {FirstMediator} from "../modules/firstScreen/firstMediator";
 import {FirstView} from "../modules/firstScreen/firstView";
+import {GameFieldMediator} from "../modules/gameField/gameFieldMediator";
+import {GameFieldView} from "../modules/gameField/gameFieldView";
 
 export class App extends Application {
 
@@ -29,6 +31,7 @@ export class App extends Application {
 
         this.registerFirstScreen();
         this.registerBg();
+        this.registerGameField()
     }
 
     async loadAssets() {
@@ -57,6 +60,13 @@ export class App extends Application {
         const parent = new Container();
         this.stage.addChild(parent);
         mediator.initView(BgView, parent);
+    }
+
+    registerGameField() {
+        const mediator = new GameFieldMediator();
+        const parent = new Container();
+        this.stage.addChild(parent);
+        mediator.initView(GameFieldView, parent);
     }
 
 
