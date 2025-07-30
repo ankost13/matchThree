@@ -1,6 +1,7 @@
 import {View} from "../../utils/view";
 import {Assets, Container, Sprite} from "pixi.js";
-import {randomInteger} from "../../utils/helperFunction";
+import {randomInteger, setAnimationTimeoutSync} from "../../utils/helperFunction";
+import {Symbol} from "./symbol";
 
 export class GameFieldView extends View {
 
@@ -11,6 +12,8 @@ export class GameFieldView extends View {
         this.symbolsCollect = []
         this.sizeField = 7
         this.symbolSize = 130
+        this.numberOfChouseSymbol = 0
+        this.previousLocation = []
     }
 
     createFieldContainer() {
@@ -43,23 +46,79 @@ export class GameFieldView extends View {
     createSymbol() {
         const textureSymbol = ["S1.png", "S2.png", "S3.png", "S4.png", "S5.png", "S6.png", "S7.png", "S8.png"]
         for (let i = 0; i < this.sizeField; i++) {
+            this.symbolsCollect[i] = []
             for (let j = 0; j < this.sizeField; j++) {
-                const symbol = new Sprite ({
-                    texture: Assets.get(textureSymbol[randomInteger(0, 7)]),
+                const currentTexture = textureSymbol[randomInteger(0, 7)]
+                const posX = i * this.symbolSize
+                const posY = j * this.symbolSize
+
+                const symbol = new Symbol ({
+                    texture: Assets.get(currentTexture),
                     alpha: 1,
                     anchor: 0.5,
                     scale: 1,
                     position: {
-                        x: i * this.symbolSize,
-                        y: j * this.symbolSize,
+                        x: posX,
+                        y: posY,
                     },
+                    location: {x: i, y: j},
+                    interactive: true,
                 })
                 this.fieldContainer.addChild(symbol)
-                this.symbolsCollect.push(symbol)
+
+                this.symbolsCollect[i][j] = symbol
+            }
+        }
+        this.addSymbolsLogic()
+    }
+
+    async switchSymbol(locationFirst, locationSecond) {
+        const locationFirstX = locationFirst[0]
+        const locationFirstY = locationFirst[1]
+        const locationSecondX = locationSecond[0]
+        const locationSecondY = locationSecond[1]
+        const tempSymbol = this.symbolsCollect[locationFirstX][locationFirstY]
+
+        this.symbolsCollect[locationFirstX][locationFirstY].moveTo(this.symbolsCollect[locationSecondX][locationSecondY].position, this.symbolsCollect[locationSecondX][locationSecondY].texture.label)
+        this.symbolsCollect[locationSecondX][locationSecondY].moveTo(tempSymbol.position, tempSymbol.texture.label)
+    }
+
+    addSymbolsLogic() {
+
+        for (let i = 0; i < this.sizeField; i++) {
+            for (let j = 0; j < this.sizeField; j++) {
+                const currentSymbol = this.symbolsCollect[i][j]
+
+                currentSymbol.cursor = "pointer"
+
+                currentSymbol.on("pointerover", () => {
+                    const currentTexture = this.symbolsCollect[i][j].texture.label[0] + this.symbolsCollect[i][j].texture.label[1]
+                    currentSymbol.texture = Assets.get(currentTexture + "_pointer.png")
+                });
+
+                currentSymbol.on("pointerout", () => {
+                    const currentTexture = this.symbolsCollect[i][j].texture.label[0] + this.symbolsCollect[i][j].texture.label[1]
+                    currentSymbol.texture = Assets.get(currentTexture + ".png")
+                });
+
+                currentSymbol.on("pointerdown", () => {
+                    const currentTexture = this.symbolsCollect[i][j].texture.label[0] + this.symbolsCollect[i][j].texture.label[1]
+                    currentSymbol.texture = Assets.get(currentTexture + ".png")
+                });
+
+                currentSymbol.on("pointerup", () => {
+                    this.numberOfChouseSymbol += 1
+                    if (this.numberOfChouseSymbol === 1) {
+                        this.previousLocation = [i,j]
+                    } else if (this.numberOfChouseSymbol === 2) {
+                        this.switchSymbol(this.previousLocation, [i,j])
+                        this.numberOfChouseSymbol = 0
+                    }
+
+                });
             }
         }
     }
-
 
 
     onResize(size) {

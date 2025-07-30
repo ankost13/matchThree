@@ -20,9 +20,29 @@
 				"h": 125
 			}
 		},
-		"S2.png": {
+		"S1_pointer.png": {
 			"frame": {
 				"x": 128,
+				"y": 1,
+				"w": 134,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 134,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 134,
+				"h": 135
+			}
+		},
+		"S2.png": {
+			"frame": {
+				"x": 264,
 				"y": 1,
 				"w": 125,
 				"h": 125
@@ -38,12 +58,32 @@
 			"sourceSize": {
 				"w": 125,
 				"h": 125
+			}
+		},
+		"S2_pointer.png": {
+			"frame": {
+				"x": 391,
+				"y": 1,
+				"w": 135,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 135,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 135,
+				"h": 135
 			}
 		},
 		"S3.png": {
 			"frame": {
-				"x": 255,
-				"y": 1,
+				"x": 1,
+				"y": 138,
 				"w": 127,
 				"h": 125
 			},
@@ -58,12 +98,32 @@
 			"sourceSize": {
 				"w": 127,
 				"h": 125
+			}
+		},
+		"S3_pointer.png": {
+			"frame": {
+				"x": 130,
+				"y": 138,
+				"w": 137,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 137,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 137,
+				"h": 135
 			}
 		},
 		"S4.png": {
 			"frame": {
-				"x": 1,
-				"y": 128,
+				"x": 269,
+				"y": 138,
 				"w": 143,
 				"h": 125
 			},
@@ -78,12 +138,32 @@
 			"sourceSize": {
 				"w": 143,
 				"h": 125
+			}
+		},
+		"S4_pointer.png": {
+			"frame": {
+				"x": 269,
+				"y": 265,
+				"w": 154,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 154,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 154,
+				"h": 135
 			}
 		},
 		"S5.png": {
 			"frame": {
-				"x": 146,
-				"y": 128,
+				"x": 1,
+				"y": 265,
 				"w": 124,
 				"h": 125
 			},
@@ -98,12 +178,32 @@
 			"sourceSize": {
 				"w": 124,
 				"h": 125
+			}
+		},
+		"S5_pointer.png": {
+			"frame": {
+				"x": 528,
+				"y": 1,
+				"w": 134,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 134,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 134,
+				"h": 135
 			}
 		},
 		"S6.png": {
 			"frame": {
-				"x": 1,
-				"y": 255,
+				"x": 414,
+				"y": 138,
 				"w": 127,
 				"h": 125
 			},
@@ -118,12 +218,32 @@
 			"sourceSize": {
 				"w": 127,
 				"h": 125
+			}
+		},
+		"S6_pointer.png": {
+			"frame": {
+				"x": 425,
+				"y": 265,
+				"w": 137,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 137,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 137,
+				"h": 135
 			}
 		},
 		"S7.png": {
 			"frame": {
-				"x": 130,
-				"y": 255,
+				"x": 1,
+				"y": 402,
 				"w": 127,
 				"h": 125
 			},
@@ -138,12 +258,32 @@
 			"sourceSize": {
 				"w": 127,
 				"h": 125
+			}
+		},
+		"S7_pointer.png": {
+			"frame": {
+				"x": 130,
+				"y": 402,
+				"w": 137,
+				"h": 135
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 137,
+				"h": 135
+			},
+			"sourceSize": {
+				"w": 137,
+				"h": 135
 			}
 		},
 		"S8.png": {
 			"frame": {
-				"x": 272,
-				"y": 128,
+				"x": 543,
+				"y": 138,
 				"w": 113,
 				"h": 125
 			},
@@ -160,24 +300,24 @@
 				"h": 125
 			}
 		},
-		"S9.png": {
+		"S8_pointer.png": {
 			"frame": {
-				"x": 384,
-				"y": 1,
-				"w": 147,
-				"h": 125
+				"x": 269,
+				"y": 402,
+				"w": 122,
+				"h": 135
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 147,
-				"h": 125
+				"w": 122,
+				"h": 135
 			},
 			"sourceSize": {
-				"w": 147,
-				"h": 125
+				"w": 122,
+				"h": 135
 			}
 		}
 	},
@@ -187,8 +327,8 @@
 		"image": "symbols.png",
 		"format": "RGBA8888",
 		"size": {
-			"w": 532,
-			"h": 381
+			"w": 663,
+			"h": 538
 		},
 		"scale": "1"
 	}
