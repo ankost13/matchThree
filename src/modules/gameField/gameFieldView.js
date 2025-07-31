@@ -72,7 +72,7 @@ export class GameFieldView extends View {
         this.addSymbolsLogic()
     }
 
-    async switchSymbol(locationFirst, locationSecond) {
+    switchSymbol(locationFirst, locationSecond) {
         const locationFirstX = locationFirst[0]
         const locationFirstY = locationFirst[1]
         const locationSecondX = locationSecond[0]
@@ -84,7 +84,6 @@ export class GameFieldView extends View {
     }
 
     addSymbolsLogic() {
-
         for (let i = 0; i < this.sizeField; i++) {
             for (let j = 0; j < this.sizeField; j++) {
                 const currentSymbol = this.symbolsCollect[i][j]
@@ -111,15 +110,24 @@ export class GameFieldView extends View {
                     if (this.numberOfChouseSymbol === 1) {
                         this.previousLocation = [i,j]
                     } else if (this.numberOfChouseSymbol === 2) {
-                        this.switchSymbol(this.previousLocation, [i,j])
+                        if (this.checkNearSymbols(this.previousLocation, [i,j])) {
+                            this.switchSymbol(this.previousLocation, [i,j])
+                        }
                         this.numberOfChouseSymbol = 0
                     }
-
                 });
             }
         }
     }
 
+    checkNearSymbols(previousLocation, currentLocation) {
+        const prevX = previousLocation[0]
+        const prevY = previousLocation[1]
+        const nextX = currentLocation[0]
+        const nextY = currentLocation[1]
+
+        return Math.abs(prevX - nextX) + Math.abs(prevY - nextY) === 1;
+    }
 
     onResize(size) {
         super.onResize(size);
