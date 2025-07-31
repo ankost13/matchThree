@@ -74,7 +74,7 @@ export class App extends Application {
         const sounds = [
             {
                 name: "backgroundSound",
-                src: "assets/sounds/backgroundSound.mp3",
+                src: "/src/assets/sounds/backgroundSound.mp3",
                 volume: 0.01,
                 loop: true,
             },

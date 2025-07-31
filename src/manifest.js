@@ -3,17 +3,17 @@ export const manifest = {
         {
             name: "gameAssets",
             assetsImg: {
-                test: {src: "./assets/img/icon.png"},
-                bg: {src: "./assets/img/bg.png"},
-                buttons: {src: "./assets/img/buttons.json"},
-                symbols: {src: "./assets/img/symbols/symbols.json"},
-                bgField: {src: "./assets/img/symbols/bg.jpg"},
+                test: {src: "/src/assets/img/icon.png"},
+                bg: {src: "/src/assets/img/bg.png"},
+                buttons: {src: "/src/assets/img/buttons.json"},
+                symbols: {src: "/src/assets/img/symbols/symbols.json"},
+                bgField: {src: "/src/assets/img/symbols/bg.jpg"},
             },
 
             spineAssets: {
                 spineboy: {
                     type: "spine",
-                    json: "./assets/spine/windmill/windmill-ess.json"
+                    json: "/src/assets/spine/windmill/windmill-ess.json"
                 },
             }
         }
