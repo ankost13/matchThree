@@ -91,18 +91,15 @@ export class GameFieldView extends View {
                 currentSymbol.cursor = "pointer"
 
                 currentSymbol.on("pointerover", () => {
-                    const currentTexture = this.symbolsCollect[i][j].texture.label[0] + this.symbolsCollect[i][j].texture.label[1]
-                    currentSymbol.texture = Assets.get(currentTexture + "_pointer.png")
+                    currentSymbol.scale = 1.2
                 });
 
                 currentSymbol.on("pointerout", () => {
-                    const currentTexture = this.symbolsCollect[i][j].texture.label[0] + this.symbolsCollect[i][j].texture.label[1]
-                    currentSymbol.texture = Assets.get(currentTexture + ".png")
+                    currentSymbol.scale = 1
                 });
 
                 currentSymbol.on("pointerdown", () => {
-                    const currentTexture = this.symbolsCollect[i][j].texture.label[0] + this.symbolsCollect[i][j].texture.label[1]
-                    currentSymbol.texture = Assets.get(currentTexture + ".png")
+                    currentSymbol.scale = 1
                 });
 
                 currentSymbol.on("pointerup", () => {
