@@ -4,26 +4,29 @@ import gsap from 'gsap';
 export class Symbol extends Sprite {
     constructor(data) {
         super(data);
-
+        this.id = data.id;
         this.location = data.location // {x, y}
     }
 
     moveTo(position, newTexture) {
-        const startPos = this.position
-        gsap.timeline()
-            .to(this, {
-            duration: .5,
-            x: position.x,
-            y: position.y,
+        return new Promise((resolve) => {
+            const startPos = this.position
+            gsap.timeline()
+                .to(this, {
+                    duration: .5,
+                    x: position.x,
+                    y: position.y,
+                })
+                .to(this, {
+                    duration: 0,
+                    x: startPos.x,
+                    y: startPos.y,
+                    onComplete: () => {
+                        this.texture = Assets.get(newTexture)
+                        resolve()
+                    }
+                })
         })
-            .to(this, {
-                duration: 0,
-                x: startPos.x,
-                y: startPos.y,
-                onComplete: () => {
-                    this.texture = Assets.get(newTexture)
-                }
-            })
     }
 
     destroyMe() {
