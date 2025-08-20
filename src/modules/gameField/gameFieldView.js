@@ -1,6 +1,6 @@
 import {View} from "../../utils/view";
 import {Assets, Container, Sprite} from "pixi.js";
-import {randomInteger, setAnimationTimeoutSync} from "../../utils/helperFunction";
+import {randomInteger} from "../../utils/helperFunction";
 import {Symbol} from "./symbol";
 
 export class GameFieldView extends View {
