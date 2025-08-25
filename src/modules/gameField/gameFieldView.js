@@ -1,6 +1,6 @@
 import {View} from "../../utils/view";
 import {Assets, Container, Sprite} from "pixi.js";
-import {randomInteger} from "../../utils/helperFunction";
+import {randomInteger, setAnimationTimeoutSync} from "../../utils/helperFunction";
 import {Symbol} from "./symbol";
 
 export class GameFieldView extends View {
@@ -14,6 +14,8 @@ export class GameFieldView extends View {
         this.symbolSize = 130
         this.numberOfChouseSymbol = 0
         this.previousLocation = []
+        this.isNumberLine = 0
+        this.isLine = false
     }
 
     createFieldContainer() {
@@ -113,7 +115,11 @@ export class GameFieldView extends View {
                     } else if (this.numberOfChouseSymbol === 2) {
                         if (this.checkNearSymbols(this.previousLocation, [i,j])) {
                            await this.switchSymbol(this.previousLocation, [i,j])
-                            this.checkLine([i,j])
+                            await this.checkLine([i,j])
+                            if (!this.isNumberLine) {
+                                console.error("!!!NO!!! lines")
+                                await this.switchSymbol([i,j], this.previousLocation)
+                            }
                         } else {
                             this.symbolsCollect[this.previousLocation[0]][this.previousLocation[1]].scale.set(1)
                             this.symbolsCollect[this.previousLocation[0]][this.previousLocation[1]].interactive = true
@@ -122,6 +128,7 @@ export class GameFieldView extends View {
                             this.symbolsCollect[i][j].interactive = true
                         }
                         this.numberOfChouseSymbol = 0
+                        this.isNumberLine = 0
                     }
                 });
             }
@@ -177,11 +184,11 @@ export class GameFieldView extends View {
     checkEqualSymbolInLine(locationFirst, locationSecond, locationThird) {
         // console.error(this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture.label)
         if ((this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label) && (this.symbolsCollect[locationThird[0]][locationThird[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label)) {
-            console.error("YES")
+            console.error("Line")
             this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture = Assets.get("ampty")
             this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture  = Assets.get("ampty")
             this.symbolsCollect[locationThird[0]][locationThird[1]].texture = Assets.get("ampty")
-
+            this.isNumberLine ++
         }
     }
 
