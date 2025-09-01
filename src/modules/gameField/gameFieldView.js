@@ -15,7 +15,6 @@ export class GameFieldView extends View {
         this.numberOfChouseSymbol = 0
         this.previousLocation = []
         this.isNumberLine = 0
-        this.isLine = false
     }
 
     createFieldContainer() {
@@ -116,9 +115,11 @@ export class GameFieldView extends View {
                         if (this.checkNearSymbols(this.previousLocation, [i,j])) {
                            await this.switchSymbol(this.previousLocation, [i,j])
                             await this.checkLine([i,j])
+                            await this.checkLine(this.previousLocation)
                             if (!this.isNumberLine) {
                                 console.error("!!!NO!!! lines")
-                                await this.switchSymbol([i,j], this.previousLocation)
+                                // ЯКЩО НЕМАЄ ЛІНІЇ МІНЯЄМ СИМВОЛИ НАЗАД
+                                // await this.switchSymbol([i,j], this.previousLocation)
                             }
                         } else {
                             this.symbolsCollect[this.previousLocation[0]][this.previousLocation[1]].scale.set(1)
@@ -154,8 +155,10 @@ export class GameFieldView extends View {
             this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
             this.checkEqualSymbolInLine([x, y], [x + 1, y], [x + 2, y])
         } else if (x === this.sizeField - 1) {
-            this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
+            // console.error("last row")
+              this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
         } else if (x === this.sizeField - 2) {
+            // console.error("last last row")
             this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
             this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
         } else {
@@ -165,31 +168,80 @@ export class GameFieldView extends View {
         }
 
         if (y === 0) {
-            this.checkEqualSymbolInLine([x, y], [x, y + 1], [x, y + 2])
+            this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
         } else if (y === 1) {
-            this.checkEqualSymbolInLine([x, y - 1], [x, y], [x, y + 1])
-            this.checkEqualSymbolInLine([x, y], [x, y + 1], [x, y + 2])
+            this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
+            this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
         } else if (y === this.sizeField - 1) {
-            this.checkEqualSymbolInLine([x, y - 2], [x, y - 1], [x, y])
+            // console.error("last line")
+            this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
         } else if (y === this.sizeField - 2) {
-            this.checkEqualSymbolInLine([x, y - 1], [x, y], [x, y + 1])
-            this.checkEqualSymbolInLine([x, y - 2], [x, y - 1], [x, y])
+            // console.error("last last line")
+            this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
+            this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
         } else {
-            this.checkEqualSymbolInLine([x, y - 1], [x, y], [x, y + 1])
-            this.checkEqualSymbolInLine([x, y], [x, y + 1], [x, y + 2])
-            this.checkEqualSymbolInLine([x, y - 2], [x, y - 1], [x, y])
+            this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
+            this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
+            this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
         }
     }
 
-    checkEqualSymbolInLine(locationFirst, locationSecond, locationThird) {
-        // console.error(this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture.label)
-        if ((this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label) && (this.symbolsCollect[locationThird[0]][locationThird[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label)) {
+    async checkEqualSymbolInLine(locationFirst, locationSecond, locationThird){
+        if(this.checkEqualSymbol(locationFirst, locationSecond, locationThird)) {
             console.error("Line")
+            this.fallSymbolWhenLine(locationFirst)
+            await setAnimationTimeoutSync(.05)
+            this.fallSymbolWhenLine(locationSecond)
+            await setAnimationTimeoutSync(.05)
+            this.fallSymbolWhenLine(locationThird)
+            this.isNumberLine ++
+        }
+    }
+
+    checkEqualSymbolInRow(locationFirst, locationSecond, locationThird){
+        if (this.checkEqualSymbol(locationFirst, locationSecond, locationThird)) {
+            console.error("Row")
+            const locationLast = Math.max(locationFirst[1], locationSecond[1], locationThird[1])
+            this.fallSymbolWhenRow(locationLast)
+            // this.isNumberLine ++
+        }
+    }
+
+    checkEqualSymbol(locationFirst, locationSecond, locationThird) {
+        if ((this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label) && (this.symbolsCollect[locationThird[0]][locationThird[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label)) {
             this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture = Assets.get("ampty")
             this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture  = Assets.get("ampty")
             this.symbolsCollect[locationThird[0]][locationThird[1]].texture = Assets.get("ampty")
-            this.isNumberLine ++
+            return true;
         }
+    }
+
+    async fallSymbolWhenLine(location) {
+        const x = location[0]
+        let y = location[1]
+
+        while (y >= 0) {
+            if (y !== 0) {
+                await Promise.all([
+                    this.symbolsCollect[x][y].moveTo(this.symbolsCollect[x][y - 1].position, this.symbolsCollect[x][y - 1].texture.label),
+                    this.symbolsCollect[x][y - 1].moveTo(this.symbolsCollect[x][y].position, this.symbolsCollect[x][y].texture.label)
+                ])
+            } else {
+                this.newFallingSymbol(x)
+            }
+            y--
+        }
+    }
+
+    fallSymbolWhenRow (location) {
+
+    }
+
+    newFallingSymbol(x) {
+        console.error(x)
+        const textureSymbol = ["S1.png", "S2.png", "S3.png", "S4.png", "S5.png", "S6.png", "S7.png", "S8.png"]
+        const currentTexture = textureSymbol[randomInteger(0, 7)]
+        // this.amptyLine[x].texture = Assets.get(currentTexture)
     }
 
     onResize(size) {
