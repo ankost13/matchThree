@@ -1,7 +1,8 @@
 import {View} from "../../utils/view";
-import {Assets, Container, Sprite} from "pixi.js";
+import {Assets, Container, Graphics, Sprite} from "pixi.js";
 import {randomInteger, setAnimationTimeoutSync} from "../../utils/helperFunction";
 import {Symbol} from "./symbol";
+import gsap from 'gsap';
 
 export class GameFieldView extends View {
 
@@ -35,13 +36,19 @@ export class GameFieldView extends View {
             texture: Assets.get("bgField"),
             alpha: .3,
             anchor: 0.5,
-            scale: 1.5,
+            scale: 1.52,
             position: {
                 x: this.symbolSize * (this.sizeField / 2 - .5),
                 y: this.symbolSize * (this.sizeField / 2 - .5),
             },
         })
+        const bgMask = new Graphics()
+            .beginFill(0xffffff)
+            .rect((-this.symbolSize)/ 2, (-this.symbolSize)/ 2, bgField.width, bgField.height)
+            .endFill();
         this.fieldContainer.addChild(bgField)
+        this.fieldContainer.addChild(bgMask)
+        this.fieldContainer.mask = bgMask
     }
 
     createSymbol() {
@@ -117,7 +124,6 @@ export class GameFieldView extends View {
                             await this.checkLine([i,j])
                             await this.checkLine(this.previousLocation)
                             if (!this.isNumberLine) {
-                                console.error("!!!NO!!! lines")
                                 // ЯКЩО НЕМАЄ ЛІНІЇ МІНЯЄМ СИМВОЛИ НАЗАД
                                 // await this.switchSymbol([i,j], this.previousLocation)
                             }
@@ -155,10 +161,8 @@ export class GameFieldView extends View {
             this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
             this.checkEqualSymbolInLine([x, y], [x + 1, y], [x + 2, y])
         } else if (x === this.sizeField - 1) {
-            // console.error("last row")
               this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
         } else if (x === this.sizeField - 2) {
-            // console.error("last last row")
             this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
             this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
         } else {
@@ -173,10 +177,8 @@ export class GameFieldView extends View {
             this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
             this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
         } else if (y === this.sizeField - 1) {
-            // console.error("last line")
             this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
         } else if (y === this.sizeField - 2) {
-            // console.error("last last line")
             this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
             this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
         } else {
@@ -188,22 +190,20 @@ export class GameFieldView extends View {
 
     async checkEqualSymbolInLine(locationFirst, locationSecond, locationThird){
         if(this.checkEqualSymbol(locationFirst, locationSecond, locationThird)) {
-            console.error("Line")
-            this.fallSymbolWhenLine(locationFirst)
+            this.fallSymbol(locationFirst)
             await setAnimationTimeoutSync(.05)
-            this.fallSymbolWhenLine(locationSecond)
+            this.fallSymbol(locationSecond)
             await setAnimationTimeoutSync(.05)
-            this.fallSymbolWhenLine(locationThird)
+            this.fallSymbol(locationThird)
             this.isNumberLine ++
         }
     }
 
     checkEqualSymbolInRow(locationFirst, locationSecond, locationThird){
         if (this.checkEqualSymbol(locationFirst, locationSecond, locationThird)) {
-            console.error("Row")
             const locationLast = Math.max(locationFirst[1], locationSecond[1], locationThird[1])
-            this.fallSymbolWhenRow(locationLast)
-            // this.isNumberLine ++
+            this.fallSymbol([locationFirst[0],locationLast], 3)
+            this.isNumberLine ++
         }
     }
 
@@ -216,32 +216,66 @@ export class GameFieldView extends View {
         }
     }
 
-    async fallSymbolWhenLine(location) {
+    async fallSymbol(location, numberFollingSymbols = 1) {
         const x = location[0]
         let y = location[1]
 
-        while (y >= 0) {
-            if (y !== 0) {
+        while (y >= numberFollingSymbols - 1) {
+            if (y !== numberFollingSymbols - 1) {
                 await Promise.all([
-                    this.symbolsCollect[x][y].moveTo(this.symbolsCollect[x][y - 1].position, this.symbolsCollect[x][y - 1].texture.label),
-                    this.symbolsCollect[x][y - 1].moveTo(this.symbolsCollect[x][y].position, this.symbolsCollect[x][y].texture.label)
+                    this.symbolsCollect[x][y].moveTo(this.symbolsCollect[x][y - numberFollingSymbols].position, this.symbolsCollect[x][y - numberFollingSymbols].texture.label),
+                    this.symbolsCollect[x][y - numberFollingSymbols].moveTo(this.symbolsCollect[x][y].position, this.symbolsCollect[x][y].texture.label)
                 ])
             } else {
-                this.newFallingSymbol(x)
+                this.newFallingSymbol(x, numberFollingSymbols)
             }
             y--
         }
     }
 
-    fallSymbolWhenRow (location) {
+    newFallingSymbol(locationX, numberFollingSymbols) {
+        const textureSymbol = ["S1.png", "S2.png", "S3.png", "S4.png", "S5.png", "S6.png", "S7.png", "S8.png"]
+        let currentTexture = ""
+        let currentPosition = []
 
+        if (numberFollingSymbols === 1){
+            currentTexture = textureSymbol[randomInteger(0, 7)]
+            currentPosition = [this.symbolsCollect[locationX][0].position.x, this.symbolsCollect[locationX][0].position.y]
+            this.follingAnimOfNewsymbols(locationX, 0, currentPosition[0], currentPosition[1], currentTexture)
+        } else {
+            for (let i = 0; i < numberFollingSymbols; i++){
+                currentTexture = textureSymbol[randomInteger(0, 7)]
+                currentPosition = [this.symbolsCollect[locationX][i].position.x, this.symbolsCollect[locationX][i].position.y]
+                this.follingAnimOfNewsymbols(locationX, i, currentPosition[0], currentPosition[1], currentTexture)
+            }
+        }
     }
 
-    newFallingSymbol(x) {
-        console.error(x)
-        const textureSymbol = ["S1.png", "S2.png", "S3.png", "S4.png", "S5.png", "S6.png", "S7.png", "S8.png"]
-        const currentTexture = textureSymbol[randomInteger(0, 7)]
-        // this.amptyLine[x].texture = Assets.get(currentTexture)
+    follingAnimOfNewsymbols(locX, locY, posX, posY, texture) {
+        this.symbolsCollect[locX][locY].position.set(posX, -this.symbolSize)
+        this.symbolsCollect[locX][locY].texture  = Assets.get(texture)
+
+        let tl = gsap.timeline();
+        const duration = .5
+        // Спочатку "вільне падіння" з прискоренням
+        tl.to(this.symbolsCollect[locX][locY], {
+            x: posX,
+            y: posY,
+            duration: duration,
+            ease: "power2.in" // прискорення вниз
+        });
+
+        // Потім легкий відскок після удару
+        tl.to(this.symbolsCollect[locX][locY], {
+            y: posY - 30,
+            duration: 0.3,
+            ease: "power2.out"
+        });
+        tl.to(this.symbolsCollect[locX][locY], {
+            y: posY,
+            duration: 0.2,
+            ease: "bounce.out"
+        });
     }
 
     onResize(size) {
