@@ -121,8 +121,10 @@ export class GameFieldView extends View {
                     } else if (this.numberOfChouseSymbol === 2) {
                         if (this.checkNearSymbols(this.previousLocation, [i,j])) {
                            await this.switchSymbol(this.previousLocation, [i,j])
-                            await this.checkLine([i,j])
-                            await this.checkLine(this.previousLocation)
+                            await this.checkEqualSymbolInLine([i,j])
+                            await this.checkEqualSymbolInRow([i,j])
+                            await this.checkEqualSymbolInLine(this.previousLocation)
+                            await this.checkEqualSymbolInRow(this.previousLocation)
                             if (!this.isNumberLine) {
                                 // ЯКЩО НЕМАЄ ЛІНІЇ МІНЯЄМ СИМВОЛИ НАЗАД
                                 // await this.switchSymbol([i,j], this.previousLocation)
@@ -151,69 +153,89 @@ export class GameFieldView extends View {
         return Math.abs(prevX - nextX) + Math.abs(prevY - nextY) === 1;
     }
 
-    checkLine(location) {
-        const x = location[0]
-        const y = location[1]
-
-        if (x === 0) {
-            this.checkEqualSymbolInLine([x, y], [x + 1, y], [x + 2, y])
-        } else if (x === 1) {
-            this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
-            this.checkEqualSymbolInLine([x, y], [x + 1, y], [x + 2, y])
-        } else if (x === this.sizeField - 1) {
-              this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
-        } else if (x === this.sizeField - 2) {
-            this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
-            this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
-        } else {
-            this.checkEqualSymbolInLine([x - 1, y], [x, y], [x + 1, y])
-            this.checkEqualSymbolInLine([x, y], [x + 1, y], [x + 2, y])
-            this.checkEqualSymbolInLine([x - 2, y], [x - 1, y], [x, y])
-        }
-
-        if (y === 0) {
-            this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
-        } else if (y === 1) {
-            this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
-            this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
-        } else if (y === this.sizeField - 1) {
-            this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
-        } else if (y === this.sizeField - 2) {
-            this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
-            this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
-        } else {
-            this.checkEqualSymbolInRow([x, y - 1], [x, y], [x, y + 1])
-            this.checkEqualSymbolInRow([x, y], [x, y + 1], [x, y + 2])
-            this.checkEqualSymbolInRow([x, y - 2], [x, y - 1], [x, y])
-        }
-    }
-
-    async checkEqualSymbolInLine(locationFirst, locationSecond, locationThird){
-        if(this.checkEqualSymbol(locationFirst, locationSecond, locationThird)) {
-            this.fallSymbol(locationFirst)
-            await setAnimationTimeoutSync(.05)
-            this.fallSymbol(locationSecond)
-            await setAnimationTimeoutSync(.05)
-            this.fallSymbol(locationThird)
+    async checkEqualSymbolInLine(location){
+        const matched = this.checkEqualSymbolInVertical(location)
+        if(matched) {
+            for (const item of matched) {
+                this.fallSymbol(item);
+                await setAnimationTimeoutSync(0.05);
+            }
             this.isNumberLine ++
         }
     }
 
-    checkEqualSymbolInRow(locationFirst, locationSecond, locationThird){
-        if (this.checkEqualSymbol(locationFirst, locationSecond, locationThird)) {
-            const locationLast = Math.max(locationFirst[1], locationSecond[1], locationThird[1])
-            this.fallSymbol([locationFirst[0],locationLast], 3)
+    async checkEqualSymbolInRow(location){
+        const matched = this.checkEqualSymbolHorisontal(location)
+        if (matched) {
+            const maxCol = Math.max(...matched.map(item => item[1]))
+            this.fallSymbol([matched[0][0], maxCol], matched.length)
             this.isNumberLine ++
         }
     }
 
-    checkEqualSymbol(locationFirst, locationSecond, locationThird) {
-        if ((this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label) && (this.symbolsCollect[locationThird[0]][locationThird[1]].texture.label === this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture.label)) {
-            this.symbolsCollect[locationFirst[0]][locationFirst[1]].texture = Assets.get("ampty")
-            this.symbolsCollect[locationSecond[0]][locationSecond[1]].texture  = Assets.get("ampty")
-            this.symbolsCollect[locationThird[0]][locationThird[1]].texture = Assets.get("ampty")
-            return true;
+    checkEqualSymbolHorisontal(location) {
+        const row = location[0];
+        const col = location[1];
+
+        const targetLabel = this.symbolsCollect[row][col].texture.label;
+
+        let matched = [[row, col]];
+
+        // Перевіряємо вліво
+        let c = col - 1;
+        while (c >= 0 && this.symbolsCollect[row][c].texture.label === targetLabel) {
+            matched.push([row, c]);
+            c--;
         }
+
+        // Перевіряємо вправо
+        c = col + 1;
+        while (c < this.symbolsCollect[row].length && this.symbolsCollect[row][c].texture.label === targetLabel) {
+            matched.push([row, c]);
+            c++;
+        }
+
+        // Якщо менше трьох — нічого не робимо
+        if (matched.length < 3) return false;
+
+        // Якщо три або більше — очищаємо всі
+        for (let [r, c] of matched) {
+            this.symbolsCollect[r][c].texture = Assets.get("ampty");
+        }
+        return matched;
+    }
+
+    checkEqualSymbolInVertical(location) {
+        const row = location[0];
+        const col = location[1];
+
+        const targetLabel = this.symbolsCollect[row][col].texture.label;
+
+        let matched = [[row, col]];
+
+        // Перевіряємо вверх
+        let r = row - 1;
+        while (r >= 0 && this.symbolsCollect[r][col].texture.label === targetLabel) {
+            matched.push([r, col]);
+            r--;
+        }
+
+        // Перевіряємо вниз
+        r = row + 1;
+        while (r < this.symbolsCollect.length && this.symbolsCollect[r][col].texture.label === targetLabel) {
+            matched.push([r, col]);
+            r++;
+        }
+
+        // Якщо менше трьох — нічого не робимо
+        if (matched.length < 3) return false;
+
+        // Якщо три або більше — очищаємо всі
+        for (let [r, c] of matched) {
+            this.symbolsCollect[r][c].texture = Assets.get("ampty");
+        }
+
+        return matched;
     }
 
     async fallSymbol(location, numberFollingSymbols = 1) {
