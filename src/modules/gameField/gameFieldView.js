@@ -92,10 +92,8 @@ export class GameFieldView extends View {
             this.symbolsCollect[locationSecondX][locationSecondY].moveTo(tempSymbol.position, tempSymbol.texture.label)
         ])
         this.symbolsCollect[locationFirstX][locationFirstY].scale.set(1)
-        this.symbolsCollect[locationFirstX][locationFirstY].interactive = true
 
         this.symbolsCollect[locationSecondX][locationSecondY].scale.set(1)
-        this.symbolsCollect[locationSecondX][locationSecondY].interactive = true
     }
 
     addSymbolsLogic() {
@@ -120,21 +118,21 @@ export class GameFieldView extends View {
                         this.previousLocation = [i,j]
                     } else if (this.numberOfChouseSymbol === 2) {
                         if (this.checkNearSymbols(this.previousLocation, [i,j])) {
-                           await this.switchSymbol(this.previousLocation, [i,j])
+                            this.setInteractiveFalseForSymbols()
+                            await this.switchSymbol(this.previousLocation, [i,j])
                             await this.checkEqualSymbolInLine([i,j])
                             await this.checkEqualSymbolInRow([i,j])
                             await this.checkEqualSymbolInLine(this.previousLocation)
                             await this.checkEqualSymbolInRow(this.previousLocation)
                             if (!this.isNumberLine) {
+                                this.setInteractiveTrueForSymbols()
                                 // ЯКЩО НЕМАЄ ЛІНІЇ МІНЯЄМ СИМВОЛИ НАЗАД
                                 // await this.switchSymbol([i,j], this.previousLocation)
                             }
                         } else {
                             this.symbolsCollect[this.previousLocation[0]][this.previousLocation[1]].scale.set(1)
-                            this.symbolsCollect[this.previousLocation[0]][this.previousLocation[1]].interactive = true
 
                             this.symbolsCollect[i][j].scale.set(1)
-                            this.symbolsCollect[i][j].interactive = true
                         }
                         this.numberOfChouseSymbol = 0
                         this.isNumberLine = 0
@@ -156,9 +154,13 @@ export class GameFieldView extends View {
     async checkEqualSymbolInLine(location){
         const matched = this.checkEqualSymbolInVertical(location)
         if(matched) {
-            for (const item of matched) {
-                this.fallSymbol(item);
-                await setAnimationTimeoutSync(0.05);
+            for (let i = 0; i < matched.length; i++) {
+                this.fallSymbol(matched[i]).then(async () => {
+                    await setAnimationTimeoutSync(0.05)
+                    if (i === matched.length - 1) {
+                        this.setInteractiveTrueForSymbols()
+                    }
+                })
             }
             this.isNumberLine ++
         }
@@ -168,8 +170,27 @@ export class GameFieldView extends View {
         const matched = this.checkEqualSymbolHorisontal(location)
         if (matched) {
             const maxCol = Math.max(...matched.map(item => item[1]))
-            this.fallSymbol([matched[0][0], maxCol], matched.length)
+            this.fallSymbol([matched[0][0], maxCol], matched.length).then(async () => {
+                await setAnimationTimeoutSync(0.05)
+                this.setInteractiveTrueForSymbols()
+            })
             this.isNumberLine ++
+        }
+    }
+
+    setInteractiveFalseForSymbols() {
+        for (let i = 0; i < this.sizeField; i++) {
+            for (let j = 0; j < this.sizeField; j++) {
+                this.symbolsCollect[i][j].interactive = false
+            }
+        }
+    }
+
+    setInteractiveTrueForSymbols() {
+        for (let i = 0; i < this.sizeField; i++) {
+            for (let j = 0; j < this.sizeField; j++) {
+                this.symbolsCollect[i][j].interactive = true
+            }
         }
     }
 
