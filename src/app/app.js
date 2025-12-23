@@ -11,6 +11,8 @@ import {FirstMediator} from "../modules/firstScreen/firstMediator";
 import {FirstView} from "../modules/firstScreen/firstView";
 import {GameFieldMediator} from "../modules/gameField/gameFieldMediator";
 import {GameFieldView} from "../modules/gameField/gameFieldView";
+import {ScoreBoardMediator} from "../modules/scoreBoard/scoreBoardMediator.js";
+import {ScoreBoardView} from "../modules/scoreBoard/scoreBoardView.js";
 
 export class App extends Application {
 
@@ -32,6 +34,7 @@ export class App extends Application {
         this.registerFirstScreen();
         this.registerBg();
         this.registerGameField()
+        this.registerScoreBoard()
     }
 
     async loadAssets() {
@@ -69,6 +72,12 @@ export class App extends Application {
         mediator.initView(GameFieldView, parent);
     }
 
+    registerScoreBoard() {
+        const mediator = new ScoreBoardMediator();
+        const parent = new Container();
+        this.stage.addChild(parent);
+        mediator.initView(ScoreBoardView, parent);
+    }
 
     async initSounds() {
         const sounds = [

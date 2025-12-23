@@ -3,6 +3,7 @@ import {Assets, Container, Graphics, Sprite} from "pixi.js";
 import {randomInteger, setAnimationTimeoutSync} from "../../utils/helperFunction";
 import {Symbol} from "./symbol";
 import gsap from 'gsap';
+import {GameFieldNotification} from "./gameFieldNotification.js";
 
 export class GameFieldView extends View {
 
@@ -16,6 +17,7 @@ export class GameFieldView extends View {
         this.numberOfChouseSymbol = 0
         this.previousLocation = []
         this.isNumberLine = 0
+        this.linesCount = 0
     }
 
     createFieldContainer() {
@@ -126,6 +128,8 @@ export class GameFieldView extends View {
                             await this.checkEqualSymbolInRow(this.previousLocation)
                             if (!this.isNumberLine) {
                                 this.setInteractiveTrueForSymbols()
+                                this.linesCount -= 2
+                                this.notifyToMediator(GameFieldNotification.UPDATE_SCORE, {currentWin: -2, generalWin: this.linesCount})
                                 // ЯКЩО НЕМАЄ ЛІНІЇ МІНЯЄМ СИМВОЛИ НАЗАД
                                 // await this.switchSymbol([i,j], this.previousLocation)
                             }
@@ -223,6 +227,8 @@ export class GameFieldView extends View {
         for (let [r, c] of matched) {
             this.symbolsCollect[r][c].texture = Assets.get("ampty");
         }
+        this.linesCount += matched.length
+        this.notifyToMediator(GameFieldNotification.UPDATE_SCORE, {currentWin: matched.length, generalWin: this.linesCount})
         return matched;
     }
 
@@ -255,7 +261,8 @@ export class GameFieldView extends View {
         for (let [r, c] of matched) {
             this.symbolsCollect[r][c].texture = Assets.get("ampty");
         }
-
+        this.linesCount += matched.length
+        this.notifyToMediator(GameFieldNotification.UPDATE_SCORE, {currentWin: matched.length, generalWin: this.linesCount})
         return matched;
     }
 
